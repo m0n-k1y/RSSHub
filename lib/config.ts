@@ -83,6 +83,7 @@ type ConfigEnvKeys =
     | 'FOLLOW_PRICE'
     | 'FOLLOW_USER_LIMIT'
     // Route-specific (dynamic cookies with prefixes)
+    | 'BAIDU_COOKIE'
     | `BILIBILI_COOKIE_${string}`
     | 'BILIBILI_DM_IMG_LIST'
     | 'BILIBILI_DM_IMG_INTER'
@@ -109,6 +110,7 @@ type ConfigEnvKeys =
     | 'EH_STAR'
     | 'EH_IMG_PROXY'
     | `EMAIL_CONFIG_${string}`
+    | 'ETHERSCAN_API_KEY'
     | 'F95ZONE_COOKIE'
     | 'FANBOX_SESSION_ID'
     | 'FANFOU_CONSUMER_KEY'
@@ -171,6 +173,7 @@ type ConfigEnvKeys =
     | 'NHENTAI_USERNAME'
     | 'NHENTAI_PASSWORD'
     | 'NOTION_TOKEN'
+    | 'ONLYFANS_COOKIE'
     | 'PATREON_SESSION_ID'
     | 'PIANYUAN_COOKIE'
     | 'PIXABAY_KEY'
@@ -360,6 +363,9 @@ export type Config = {
     };
 
     // Route-specific Configurations
+    baidu: {
+        cookie?: string;
+    };
     bilibili: {
         cookies: Record<string, string | undefined>;
         dmImgList?: string;
@@ -415,6 +421,9 @@ export type Config = {
     };
     email: {
         config: Record<string, string | undefined>;
+    };
+    etherscan: {
+        apiKey?: string;
     };
     f95zone: {
         cookie?: string;
@@ -556,6 +565,9 @@ export type Config = {
     };
     notion: {
         key?: string;
+    };
+    onlyfans: {
+        cookie?: string;
     };
     patreon: {
         sessionId?: string;
@@ -713,7 +725,7 @@ export type Config = {
     };
 };
 
-const value: Config | Record<string, any> = {};
+const value = {} as Config;
 
 const TRUE_UA = 'RSSHub/1.0 (+http://github.com/DIYgod/RSSHub; like FeedFetcher-Google)';
 
@@ -863,6 +875,9 @@ const calculateValue = () => {
         },
 
         // Route-specific Configurations
+        baidu: {
+            cookie: envs.BAIDU_COOKIE,
+        },
         bilibili: {
             cookies: bilibili_cookies,
             dmImgList: envs.BILIBILI_DM_IMG_LIST,
@@ -918,6 +933,9 @@ const calculateValue = () => {
         },
         email: {
             config: email_config,
+        },
+        etherscan: {
+            apiKey: envs.ETHERSCAN_API_KEY,
         },
         f95zone: {
             cookie: envs.F95ZONE_COOKIE,
@@ -1059,6 +1077,9 @@ const calculateValue = () => {
         },
         notion: {
             key: envs.NOTION_TOKEN,
+        },
+        onlyfans: {
+            cookie: envs.ONLYFANS_COOKIE,
         },
         patreon: {
             sessionId: envs.PATREON_SESSION_ID,
@@ -1216,9 +1237,7 @@ const calculateValue = () => {
         },
     };
 
-    for (const name in _value) {
-        value[name] = _value[name];
-    }
+    Object.assign(value, _value);
 };
 calculateValue();
 (async () => {
@@ -1244,7 +1263,6 @@ calculateValue();
     }
 })();
 
-// @ts-expect-error value is set
 export const config: Config = value;
 
 export const setConfig = (env: ConfigEnv) => {
